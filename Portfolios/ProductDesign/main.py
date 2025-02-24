@@ -2,7 +2,6 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from fastapi.middleware.cors import CORSMiddleware
-
 ui_ux_app = FastAPI(docs_url=None,redoc_url=None)
 origins=[
     "https://localhost:8000"
