@@ -1,7 +1,9 @@
 from dotenv import load_dotenv
 import os
 import pprint
+import re
 import pymongo
+import json
 MONGO_URI = os.getenv("MONGO_URI")
 from bson.objectid import ObjectId
 
@@ -35,10 +37,21 @@ def get_all_projects_func(DB):
         list: A list of project documents retrieved from the database.
               Each project is represented as a dictionary.
     """
+    cleaned_data = []
     with pymongo.MongoClient(MONGO_URI) as cli:
         db = cli[DB]
         project_collection = db.project
-        return [str(projectlist) for projectlist in project_collection.find()]
+        project_list =[str(projectlist) for projectlist in project_collection.find()]
+        for item in project_list:
+            # Replace ObjectId with just the string value
+            item = re.sub(r"ObjectId\('([a-f0-9]{24})'\)", r'"\1"', item)
+            
+            # Replace single quotes with double quotes
+            item = item.replace("'", '"')
+            item = item.replace('\"s', "'s")
+            cleaned_data.append(item)
+        
+        return cleaned_data 
       
 
 def create_project_func(**kwargs):
