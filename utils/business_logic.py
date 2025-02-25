@@ -38,7 +38,7 @@ def get_all_projects_func(DB):
     with pymongo.MongoClient(MONGO_URI) as cli:
         db = cli[DB]
         project_collection = db.project
-        return list(project_collection.find())  # Directly converting to list
+        return [str(projectlist) for projectlist in project_collection.find()]
       
 
 def create_project_func(**kwargs):
@@ -99,7 +99,7 @@ def update_project_func(**kwargs):
         db = cli[kwargs["DB"]]
         project_collection = db.project
         acknowledged=project_collection.update_one(filter=_filter,update={"$set":kwargs["update_fields"]}).modified_count
-        return {"no_of_modified_fields":acknowledged}
+        return {"Affected":acknowledged}
 
 
 def get_particular_project_func(DB, projectId: str):
@@ -125,8 +125,7 @@ def get_particular_project_func(DB, projectId: str):
             return {"error":"object Id exception"}
 
         project = project_collection.find_one({'_id': object_id})
-        pprint.pprint(project)  # Optional: Debugging purpose
-        return project
+        return str(project)
 
 
 
@@ -141,12 +140,10 @@ def delete_project_func(DB,projectId:str):
         db = cli[DB]
         project_collection = db.project
         delete_count = project_collection.delete_one(filter=_filter).deleted_count
-        return {"Deleted row Count":delete_count}    
+        return {"Affected":delete_count}    
 
     
     
 
 
 
-
-print(update_project_func(project_id="67bd98023d0fca9a53ad1645",DB="ui_ux_portfolio",update_fields={"name":"Recipify"}))
