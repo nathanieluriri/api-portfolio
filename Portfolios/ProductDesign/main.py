@@ -6,7 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from utils.business_logic import get_all_projects_func ,get_particular_project_func ,update_project_func,create_project_func,delete_project_func
 ui_ux_app = FastAPI(redoc_url=None)
 origins=[
-    "https://localhost:8000"
+    "https://localhost:3000",
+    "https://localhost:8000",
+    "https://portfolio.uriri.com.ng",
+    "http://portfolio.uriri.com.ng",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    
 ]
 ui_ux_app.add_middleware(
     CORSMiddleware,
