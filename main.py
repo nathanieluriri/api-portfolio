@@ -4,7 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(docs_url=None,redoc_url=None)
 origins=[
-    "https://localhost:8000"
+    "https://localhost:3000",
+    "https://localhost:8000",
+    "https://portfolio.uriri.com.ng",
+    "http://portfolio.uriri.com.ng",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    
 ]
 app.add_middleware(
     CORSMiddleware,
