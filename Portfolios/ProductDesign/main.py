@@ -51,12 +51,14 @@ def get_project(projectId:str):
     """
     try:
        project= get_particular_project_func(DB=DB,projectId=projectId)
+       project = {"_id":project[0],"name":project[1],"description":json.dumps(project[2]),"case_study_image_link":project[3],"case_study_link":project[4]}
+           
     except:
         raise HTTPException(status_code=500,detail=f"Couldn't get a particular project with projectid {projectId}") 
     
     if project =='None':
         raise HTTPException(status_code=404,detail="There isn't a project with that project id in the database")
-    return {"project":project}
+    return project
 
 
 

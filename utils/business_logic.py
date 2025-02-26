@@ -138,8 +138,20 @@ def get_particular_project_func(DB, projectId: str):
             return {"error":"object Id exception"}
 
         project = project_collection.find_one({'_id': object_id})
-        return str(project)
-
+        cleaned_data =[]
+        s = {}
+        
+        print(type(project))
+        for item in project:
+            # Replace ObjectId with just the string value
+            item = re.sub(r"ObjectId\('([a-f0-9]{24})'\)", r'"\1"', item)
+            
+            # Replace single quotes with double quotes
+            item = item.replace("'", '"')
+            item = item.replace('\"s', "'s")
+            cleaned_data.append(str(project.get(item)))
+        
+        return cleaned_data 
 
 
 def delete_project_func(DB,projectId:str):
