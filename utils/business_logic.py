@@ -8,6 +8,30 @@ MONGO_URI = os.getenv("MONGO_URI")
 from bson.objectid import ObjectId
 
 
+from datetime import datetime
+
+def get_current_date():
+    # Get the current date and time
+    now = datetime.now()
+    
+    # Get the day of the month
+    day = now.day
+    
+    # Add suffixes to day (st, nd, rd, th)
+    if 4 <= day <= 20 or day % 10 == 0:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    
+    # Format the current date in the desired format
+    formatted_date = now.strftime(f"%A, {day}{suffix}, %B %Y")
+    
+    return formatted_date
+
+
+
+
+
 def get_all_databases():
     """
     Retrieves a list of portfolio databases 
@@ -168,7 +192,81 @@ def delete_project_func(DB,projectId:str):
         return {"Affected":delete_count}    
 
     
+ 
+def delete_contact_func(DB,contact_id:str):
+    try:
+        object_id = ObjectId(contact_id) 
+    except:
+        return {"error":"object Id exception"}
+    _filter = {"_id":object_id}
     
+    with pymongo.MongoClient(MONGO_URI) as cli:
+        db = cli[DB]
+        project_collection = db.messages
+        delete_count = project_collection.delete_one(filter=_filter).deleted_count
+        return {"Affected":delete_count}    
+
+   
 
 
 
+def get_all_contact_messages_func(DB):
+    """
+    Retrieves all Contact messages from the specified MongoDB database.
+
+    Args:
+        DB (str): The name of the database.
+                  Must be one of: ('backend_dev_portfolio', 'machine_learning_portfolio', 
+                                  'mobile_dev_portfolio', 'ui_ux_portfolio', 'web_design_portfolio')
+
+    Returns:
+        list: A list of project documents retrieved from the database.
+              Each project is represented as a dictionary.
+    """
+    cleaned_data = []
+    with pymongo.MongoClient(MONGO_URI) as cli:
+        db = cli[DB]
+        project_collection = db.messages
+        project_list =[str(projectlist) for projectlist in project_collection.find()]
+        for item in project_list:
+            # Replace ObjectId with just the string value
+            item = re.sub(r"ObjectId\('([a-f0-9]{24})'\)", r'"\1"', item)
+
+            cleaned_data.append(item)
+        
+        return cleaned_data
+      
+
+
+
+
+def create_contact_message_func(**kwargs):
+    """
+    Creates a new Contact Message entry in the specified MongoDB database.
+
+    Args:
+        DB (str): The name of the database. 
+                  Must be one of: ('backend_dev_portfolio', 'machine_learning_portfolio', 
+                                  'mobile_dev_portfolio', 'ui_ux_portfolio', 'web_design_portfolio')
+        messages (dict): A dictionary containing project details with the following structure:
+            - firstName (str): The first name of the user.
+            - lastName (str): The last name of user.
+            - subject (str): Subject of message user wants to send.
+            - message (str): Message user wants to send.
+            - emailAddress (str): email Address of the user
+
+    Returns:
+        dict: A dictionary containing the newly created project's ID:
+            - project_id (str): The MongoDB ObjectId of the inserted project.
+    """
+    with pymongo.MongoClient(MONGO_URI) as cli:
+        db = cli[kwargs["DB"]]
+        project_collection = db.messages
+        
+        project_data = kwargs.get("messages")
+        if not project_data:
+            raise ValueError("Missing required argument: 'Messages'")
+        print(project_data,type(project_data))
+        project_data['currentDate']= get_current_date()
+        new_document_id = project_collection.insert_one(project_data).inserted_id
+        return {"contact_id": str(new_document_id)}  # Convert ObjectId to string for JSON compatibility
