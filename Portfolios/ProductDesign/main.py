@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from fastapi.middleware.cors import CORSMiddleware
 from utils.business_logic import get_all_projects_func ,get_particular_project_func ,update_project_func,create_project_func,delete_project_func,delete_contact_func,create_contact_message_func,get_all_contact_messages_func
-ui_ux_app = FastAPI(redoc_url=None)
+ui_ux_app = FastAPI(docs_url=None,redoc_url=None)
 origins=[
     "https://localhost:3000",
     "https://localhost:8000",
